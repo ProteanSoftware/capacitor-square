@@ -57,7 +57,7 @@ public class SquarePayments extends Plugin {
             // Do something with the data
             savedCall.success();
         } else {
-            savedCall.reject();
+            savedCall.reject("response code did not match");
         }
     }
 }
