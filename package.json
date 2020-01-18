@@ -1,0 +1,51 @@
+{
+  "name": "@proteansoftware/capacitor-square",
+  "version": "0.0.1-alpha.1",
+  "description": "Integrate with Square Payments SDK",
+  "main": "dist/esm/index.js",
+  "types": "dist/esm/index.d.ts",
+  "scripts": {
+    "build": "npm run clean && tsc",
+    "clean": "rimraf ./dist",
+    "watch": "tsc --watch",
+    "prepublishOnly": "npm run build"
+  },
+  "author": "Ashley Medway",
+  "license": "MIT",
+  "dependencies": {
+    "@capacitor/core": "latest"
+  },
+  "devDependencies": {
+    "@capacitor/android": "latest",
+    "@capacitor/ios": "latest",
+    "mkdirp": "^0.5.1",
+    "rimraf": "^3.0.0",
+    "typescript": "^3.2.4"
+  },
+  "files": [
+    "dist/",
+    "ios/",
+    "android/",
+    "ProteansoftwareCapacitorSquare.podspec"
+  ],
+  "keywords": [
+    "capacitor",
+    "plugin",
+    "native"
+  ],
+  "capacitor": {
+    "ios": {
+      "src": "ios"
+    },
+    "android": {
+      "src": "android"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ProteanSoftware/capacitor-square"
+  },
+  "bugs": {
+    "url": "https://github.com/ProteanSoftware/capacitor-square/issues"
+  }
+}

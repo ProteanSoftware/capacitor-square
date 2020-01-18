@@ -1,0 +1,26 @@
+import { WebPlugin } from '@capacitor/core';
+import { SquarePaymentsPlugin } from './definitions';
+
+export class SquarePaymentsWeb extends WebPlugin implements SquarePaymentsPlugin {
+  constructor() {
+    super({
+      name: 'SquarePayments',
+      platforms: ['web']
+    });
+  }
+
+  async init(options: { applicationId: string; }): Promise<void> {
+    throw new Error("Method not implemented.");
+  }
+
+  async startTransaction(options: { value: string }): Promise<void> {
+    throw new Error("Method not implemented.");
+  }
+}
+
+const SquarePayments = new SquarePaymentsWeb();
+
+export { SquarePayments };
+
+import { registerWebPlugin } from '@capacitor/core';
+registerWebPlugin(SquarePayments);
