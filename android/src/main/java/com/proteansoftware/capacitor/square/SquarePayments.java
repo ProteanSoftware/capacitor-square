@@ -8,6 +8,7 @@ import com.getcapacitor.NativePlugin;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
+
 import com.squareup.sdk.pos.ChargeRequest;
 import com.squareup.sdk.pos.CurrencyCode;
 import com.squareup.sdk.pos.PosClient;
@@ -20,7 +21,7 @@ public class SquarePayments extends Plugin {
     private static final int CHARGE_REQUEST_CODE = 1;
 
     @PluginMethod()
-    public void init(PluginCall call) {
+    public void initApp(PluginCall call) {
       APPLICATION_ID = call.getString("ApplicationId");
     }
 
@@ -29,22 +30,15 @@ public class SquarePayments extends Plugin {
         Context context = getContext();
         PosClient posClient = PosSdk.createClient(context, APPLICATION_ID);
         
-        ChargeRequest request = new ChargeRequest.Builder(
-            100,
-            CurrencyCode.GBP)
-            .build();
-            try {
-              Intent intent = posClient.createChargeIntent(request);
-              saveCall(call);
-              startActivityForResult(call, intent, CHARGE_REQUEST_CODE);
-
-      
-            } catch (ActivityNotFoundException e) {
-              // TODO: Square not installed
-              posClient.openPointOfSalePlayStoreListing();
-            }
-
-        call.success();
+        ChargeRequest request = new ChargeRequest.Builder(100, CurrencyCode.GBP).build();
+        try {
+            Intent intent = posClient.createChargeIntent(request);
+            saveCall(call);
+            startActivityForResult(call, intent, CHARGE_REQUEST_CODE);
+        } catch (ActivityNotFoundException e) {
+            // TODO: Square not installed
+            posClient.openPointOfSalePlayStoreListing();
+        }
     }
 
     // in order to handle the intents result, you have to @Override handleOnActivityResult
@@ -58,8 +52,12 @@ public class SquarePayments extends Plugin {
         if (savedCall == null) {
             return;
         }
+
         if (requestCode == CHARGE_REQUEST_CODE) {
             // Do something with the data
+            savedCall.success();
+        } else {
+            savedCall.reject();
         }
     }
 }

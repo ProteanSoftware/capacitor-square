@@ -8,10 +8,12 @@ import Capacitor
 @objc(SquarePayments)
 public class SquarePayments: CAPPlugin {
     
-    @objc func echo(_ call: CAPPluginCall) {
-        let value = call.getString("value") ?? ""
-        call.success([
-            "value": value
-        ])
+    @objc func initApp(_ call: CAPPluginCall) {
+        let value = call.getString("applicationId") ?? ""
+        call.reject("NOT IMPLEMENTED")
+    }
+
+    @objc func startTransaction(_ call: CAPPluginCall) {
+        call.reject("NOT IMPLEMENTED")
     }
 }
