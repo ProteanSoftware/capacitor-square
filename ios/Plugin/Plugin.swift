@@ -80,23 +80,40 @@ public class SquarePayments: CAPPlugin {
 
   @objc func handleIosResponse(_ call: CAPPluginCall) {
     if let url = call.getString("url") {
-      var decodeError: Error?
-      let response = SCCAPIResponse(responseURL: url, error: &decodeError);
+        var decodeError: Error?
+      
+        if let nsUrl = URL(string: url) {
+            do {
+                let response = try SCCAPIResponse(responseURL: nsUrl);
+                
+                if response.isSuccessResponse {
+                  // Print checkout object
+                  self.notifyListeners("transactionComplete", data: [
+                      "message": "Transaction successful: \(response)"
+                  ]);
+                } else if decodeError != nil {
+                    // Print decode error
+                    if let decodeError = decodeError {
+                        self.notifyListeners("transactionFailed", data: [
+                            "message": "Decode Error: \(decodeError)"
+                        ]);
+                    }
+                } else {
+                    // Print the error code
+                    self.notifyListeners("transactionFailed", data: [
+                        "message": "Request failed: \(response.error)"
+                    ]);
+                }
 
-      if response.isSuccessResponse {
-        // Print checkout object
-        self.notifyListeners("transactionComplete", data: ["Transaction successful: \(response)"]);
-      } else if decodeError != nil {
-        // Print decode error
-        if let decodeError = decodeError {
-          self.notifyListeners("transactionFailed", data: ["Decode Error: \(decodeError)"]);
+                call.resolve();
+            } catch {
+                self.notifyListeners("transactionFailed", data: [
+                    "message": "Error getting response"
+                ]);
+            }
+        } else {
+          call.reject("Url null");
         }
-      } else {
-        // Print the error code
-        self.notifyListeners("transactionFailed", data: ["Request failed: \(response.error)"]);
-      }
-
-      call.resolve();
     } else {
       call.reject("Url null");
     }
