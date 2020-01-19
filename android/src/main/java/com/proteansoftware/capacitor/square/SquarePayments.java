@@ -71,7 +71,6 @@ public class SquarePayments extends Plugin {
         }
 
         saveCall(call);
-        PosClient posClient = null;
         try {
             ChargeRequest request = new ChargeRequest.Builder(totalAmount, currencyCode).build();
             Intent intent = posClient.createChargeIntent(request);
