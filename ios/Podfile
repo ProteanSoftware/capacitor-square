@@ -7,6 +7,8 @@ def capacitor_pods
   pod 'CapacitorCordova', :path => '../node_modules/@capacitor/ios'
 end
 
+pod 'SquarePointOfSaleSDK'
+
 target 'Plugin' do
   capacitor_pods
 end

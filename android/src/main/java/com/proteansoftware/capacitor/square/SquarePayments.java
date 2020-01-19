@@ -4,6 +4,7 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 
+import com.getcapacitor.JSObject;
 import com.getcapacitor.NativePlugin;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
@@ -17,27 +18,71 @@ import com.squareup.sdk.pos.PosSdk;
 @NativePlugin()
 public class SquarePayments extends Plugin {
 
-    private static String APPLICATION_ID = null;
     private static final int CHARGE_REQUEST_CODE = 1;
+    private static PosClient posClient = null;
 
     @PluginMethod()
     public void initApp(PluginCall call) {
-      APPLICATION_ID = call.getString("ApplicationId");
+        String applicationId = call.getString("applicationId");
+        if(applicationId == null || applicationId.length() == 0) {
+            call.reject("applicationId null");
+            return;
+        }
+
+        Context context = getContext();
+        posClient = PosSdk.createClient(context, applicationId);
+
+        JSObject data = new JSObject();
+        data.put("message", "set applicationId");
+        call.success(data);
     }
 
     @PluginMethod()
     public void startTransaction(PluginCall call) {
-        Context context = getContext();
-        PosClient posClient = PosSdk.createClient(context, APPLICATION_ID);
-        
-        ChargeRequest request = new ChargeRequest.Builder(100, CurrencyCode.GBP).build();
+        if(posClient == null) {
+            call.reject("client not setup, call initApp first");
+            return;
+        }
+
+        Integer totalAmount = call.getInt("totalAmount");
+        if(totalAmount == null) {
+            call.reject("totalAmount is null");
+            return;
+        }
+
+        if(totalAmount <= 0) {
+            call.reject("totalAmount must be greater than 0");
+            return;
+        }
+
+        String currencyCodeString = call.getString("currencyCode");
+        if(currencyCodeString == null || currencyCodeString.length() == 0) {
+            call.reject("currencyCode is null");
+            return;
+        }
+
+        CurrencyCode currencyCode;
         try {
+            currencyCode = CurrencyCode.valueOf(currencyCodeString);
+        } catch (IllegalArgumentException e) {
+            call.reject("currencyCode '" + currencyCodeString + "' is invalid");
+            return;
+        }
+
+        saveCall(call);
+        PosClient posClient = null;
+        try {
+            ChargeRequest request = new ChargeRequest.Builder(totalAmount, currencyCode).build();
             Intent intent = posClient.createChargeIntent(request);
-            saveCall(call);
             startActivityForResult(call, intent, CHARGE_REQUEST_CODE);
         } catch (ActivityNotFoundException e) {
             // TODO: Square not installed
-            posClient.openPointOfSalePlayStoreListing();
+            if(posClient != null) {
+                posClient.openPointOfSalePlayStoreListing();
+            }
+            call.reject(e.getMessage());
+        } catch (Exception e) {
+            call.reject(e.getMessage());
         }
     }
 
@@ -50,14 +95,29 @@ public class SquarePayments extends Plugin {
         PluginCall savedCall = getSavedCall();
 
         if (savedCall == null) {
+            savedCall.reject("could not retrive saved call");
             return;
         }
 
-        if (requestCode == CHARGE_REQUEST_CODE) {
+        if (requestCode != CHARGE_REQUEST_CODE) {
             // Do something with the data
-            savedCall.success();
-        } else {
             savedCall.reject("response code did not match");
+            return;
+        }
+       
+        // Handle expected results
+        if (resultCode == Activity.RESULT_OK) {
+            // Handle success
+            ChargeRequest.Success success = posClient.parseChargeSuccess(data);
+            JSObject resultData = new JSObject();
+            resultData.put("message", "Success");
+            resultData.put("clientTransactionId", success.clientTransactionId);
+            savedCall.success(resultData);
+        } else {
+            // Handle expected errors
+            ChargeRequest.Error error = posClient.parseChargeError(data);
+            String errorMessage = "Error" + error.code + "\nclientTransactionId" + error.debugDescription;
+            savedCall.reject(errorMessage);
         }
     }
 }
