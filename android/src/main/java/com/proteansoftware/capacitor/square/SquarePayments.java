@@ -16,10 +16,12 @@ import com.squareup.sdk.pos.CurrencyCode;
 import com.squareup.sdk.pos.PosClient;
 import com.squareup.sdk.pos.PosSdk;
 
-@NativePlugin()
+@NativePlugin(
+    requestCodes={SquarePayments.CHARGE_REQUEST_CODE}
+)
 public class SquarePayments extends Plugin {
 
-    private static final int CHARGE_REQUEST_CODE = 1;
+    public static final int CHARGE_REQUEST_CODE = 1;
     private static PosClient posClient = null;
 
     @PluginMethod()
@@ -91,17 +93,22 @@ public class SquarePayments extends Plugin {
     // in order to handle the intents result, you have to @Override handleOnActivityResult
     @Override
     protected void handleOnActivityResult(int requestCode, int resultCode, Intent data) {
+        super.handleOnActivityResult(requestCode, resultCode, data);
         // Get the previously saved call
         PluginCall savedCall = getSavedCall();
+        JSObject errorObject = new JSObject();
         try {
             if (savedCall == null) {
-                savedCall.reject("could not retrieve saved call");
+                errorObject.put("error", "could not retrieve saved call");
+                notifyListeners("transactionFailed", errorObject);
+                savedCall.success();
                 return;
             }
 
             if (requestCode != CHARGE_REQUEST_CODE) {
-                // Do something with the data
-                savedCall.reject("response code did not match");
+                errorObject.put("error", "response code did not matchl");
+                notifyListeners("transactionFailed", errorObject);
+                savedCall.success();
                 return;
             }
 
@@ -112,15 +119,20 @@ public class SquarePayments extends Plugin {
                 JSObject resultData = new JSObject();
                 resultData.put("message", "Success");
                 resultData.put("clientTransactionId", success.clientTransactionId);
-                savedCall.success(resultData);
+                notifyListeners("transactionComplete", resultData);
+                savedCall.success();
             } else {
                 // Handle expected errors
                 ChargeRequest.Error error = posClient.parseChargeError(data);
                 String errorMessage = "Error" + error.code + "\nclientTransactionId" + error.debugDescription;
-                savedCall.reject(errorMessage);
+                errorObject.put("error", errorMessage);
+                notifyListeners("transactionFailed", errorObject);
+                savedCall.success();
             }
         } catch (Exception e) {
-            savedCall.reject(e.getMessage());
+            errorObject.put("error", e.getMessage());
+            notifyListeners("transactionFailed", errorObject);
+            savedCall.success();
         }
     }
 }

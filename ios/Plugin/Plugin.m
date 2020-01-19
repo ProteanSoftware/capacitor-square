@@ -6,4 +6,5 @@
 CAP_PLUGIN(SquarePayments, "SquarePayments",
            CAP_PLUGIN_METHOD(startTransaction, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(initApp, CAPPluginReturnPromise);
+           CAP_PLUGIN_METHOD(handleIosResponse, CAPPluginReturnPromise);
 )

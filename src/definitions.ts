@@ -10,5 +10,6 @@ export interface SquarePaymentsPlugin {
     totalAmount: number,
     currencyCode: string,
     callbackUrl?: string
-  }): Promise<{ message: string, clientTransactionId: string }>;
+  }): Promise<void>;
+  handleIosResponse(options: { url: string }): Promise<void>;
 }

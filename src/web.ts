@@ -17,7 +17,11 @@ export class SquarePaymentsWeb extends WebPlugin implements SquarePaymentsPlugin
     totalAmount: number,
     currencyCode: string,
     callbackUrl?: string
-  }): Promise<{ message: string, clientTransactionId: string }> {
+  }): Promise<void> {
+    throw new Error("Method not implemented.");
+  }
+
+  async handleIosResponse(_options: { url: string; }): Promise<void> {
     throw new Error("Method not implemented.");
   }
 }
