@@ -71,11 +71,13 @@ public class SquarePayments: CAPPlugin {
       return;
     }
 
-    var success = false
     do {
       try SCCAPIConnection.perform(request)
-      success = true
-    } catch {}
+    } catch {
+      call.reject("unable to action request")
+    }
+
+    call.resolve();
   }
 
   @objc func handleIosResponse(_ call: CAPPluginCall) {
