@@ -8,10 +8,12 @@ import SquarePointOfSaleSDK
  */
 @objc(SquarePayments)
 public class SquarePayments: CAPPlugin {
-    
+    static var ApplicationId = "";
+
     @objc func initApp(_ call: CAPPluginCall) {
         if let applicationId = call.getString("applicationId") {
-          SCCAPIRequest.clientID = applicationId;
+            SquarePayments.ApplicationId = applicationId;
+            SCCAPIRequest.setClientID(applicationId);
           call.resolve([
             "message": "set applicationId"
           ]);
@@ -21,7 +23,7 @@ public class SquarePayments: CAPPlugin {
     }
 
     @objc func startTransaction(_ call: CAPPluginCall) {
-      if SCCAPIRequest.clientID.count == 0 {
+        if SquarePayments.ApplicationId.count == 0 {
         call.reject("client not setup, call initApp first")
       }
 
@@ -45,7 +47,7 @@ public class SquarePayments: CAPPlugin {
       let yourCallbackURL = URL(string: callbackUrl)!
 
       // Specify the amount of money to charge.
-      var amount: SCCMoney?
+      var amount: SCCMoney
       do {
           amount = try SCCMoney(amountCents: totalAmount, currencyCode: currencyCode);
       } catch {
@@ -53,15 +55,15 @@ public class SquarePayments: CAPPlugin {
         return;
       }
 
-      var request: SCCAPIRequest?
+      var request: SCCAPIRequest
       do {
-          request = try SCCAPIRequest(callbackURL: callbackURL,
+          request = try SCCAPIRequest(callbackURL: yourCallbackURL,
                                       amount: amount,
                                       userInfoString: nil,
                                       merchantID: nil,
                                       notes: "Coffee",
                                       customerID: nil,
-                                      supportedTenderTypes: SCCAPIRequestTenderTypeAll,
+                                      supportedTenderTypes: SCCAPIRequestTenderTypes.all,
                                       clearsDefaultFees: false,
                                       returnAutomaticallyAfterPayment: false)
       } catch {
@@ -71,7 +73,7 @@ public class SquarePayments: CAPPlugin {
 
       var success = false
       do {
-          try SCCAPIConnection.performRequest(request)
+        try SCCAPIConnection.perform(request)
           success = true
       } catch {}
     }
