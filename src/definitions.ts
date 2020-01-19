@@ -5,6 +5,10 @@ declare module "@capacitor/core" {
 }
 
 export interface SquarePaymentsPlugin {
-  initApp(options: { applicationId: string }): Promise<{message: string}>;
-  startTransaction(options: { value: string }): Promise<{message: string, clientTransactionId: string}>;
+  initApp(options: { applicationId: string }): Promise<{ message: string }>;
+  startTransaction(options: {
+    totalAmount: number,
+    currencyCode: string,
+    callbackUrl?: string
+  }): Promise<{ message: string, clientTransactionId: string }>;
 }
