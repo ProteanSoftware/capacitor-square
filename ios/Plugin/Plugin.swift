@@ -54,6 +54,32 @@ public class SquarePayments: CAPPlugin {
       call.reject("unable to create amount, maybe invalid currenyCode");
       return;
     }
+    
+    var supportedTenderTypes: SCCAPIRequestTenderTypes = SCCAPIRequestTenderTypes.init();
+    if let allowedPaymentMethods = call.getArray("allowedPaymentMethods", String.self) {
+        for paymentMethod in allowedPaymentMethods {
+            switch paymentMethod {
+            case "CARD":
+                supportedTenderTypes.insert(SCCAPIRequestTenderTypes.card);
+                break;
+            case "CARD_ON_FILE":
+                supportedTenderTypes.insert(SCCAPIRequestTenderTypes.cardOnFile);
+                break;
+            case "CASH":
+                supportedTenderTypes.insert(SCCAPIRequestTenderTypes.cash);
+                break;
+            case "OTHER":
+                supportedTenderTypes.insert(SCCAPIRequestTenderTypes.other);
+                supportedTenderTypes.insert(SCCAPIRequestTenderTypes.squareGiftCard);
+                break;
+            default:
+                call.reject("paymentMethod type '" + paymentMethod + "' is invalid");
+                return;
+            }
+        }
+    } else {
+        supportedTenderTypes = SCCAPIRequestTenderTypes.all;
+    }
 
     var request: SCCAPIRequest
     do {
@@ -61,9 +87,9 @@ public class SquarePayments: CAPPlugin {
                                     amount: amount,
                                     userInfoString: nil,
                                     merchantID: nil,
-                                    notes: "Coffee",
+                                    notes: nil,
                                     customerID: nil,
-                                    supportedTenderTypes: SCCAPIRequestTenderTypes.all,
+                                    supportedTenderTypes: supportedTenderTypes,
                                     clearsDefaultFees: false,
                                     returnAutomaticallyAfterPayment: true)
     } catch {
