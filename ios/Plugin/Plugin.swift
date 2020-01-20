@@ -138,6 +138,7 @@ public class SquarePayments: CAPPlugin {
                 self.notifyListeners("transactionFailed", data: [
                     "message": "Error getting response"
                 ]);
+                call.resolve();
             }
         } else {
           call.reject("Url null");
