@@ -9,6 +9,7 @@ export interface SquarePaymentsPlugin {
   startTransaction(options: {
     totalAmount: number,
     currencyCode: string,
+    allowedPaymentMethods?: string[],
     callbackUrl?: string
   }): Promise<void>;
   handleIosResponse(options: { url: string }): Promise<void>;

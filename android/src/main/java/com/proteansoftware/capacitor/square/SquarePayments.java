@@ -5,6 +5,7 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 
+import com.getcapacitor.JSArray;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.NativePlugin;
 import com.getcapacitor.Plugin;
@@ -15,6 +16,11 @@ import com.squareup.sdk.pos.ChargeRequest;
 import com.squareup.sdk.pos.CurrencyCode;
 import com.squareup.sdk.pos.PosClient;
 import com.squareup.sdk.pos.PosSdk;
+
+import org.json.JSONException;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @NativePlugin(
     requestCodes={SquarePayments.CHARGE_REQUEST_CODE}
@@ -72,10 +78,36 @@ public class SquarePayments extends Plugin {
             return;
         }
 
+        JSArray defaultPaymentMethods = new JSArray();
+        defaultPaymentMethods.put(-1);
+
+        ArrayList<ChargeRequest.TenderType> restrictPaymentMethods = new ArrayList<>();
+        try {
+            List allowedPaymentMethods = call.getArray("allowedPaymentMethods", defaultPaymentMethods).toList();
+            if(!allowedPaymentMethods.contains("ALL")) {
+                for (Object i: allowedPaymentMethods) {
+                    try {
+                        ChargeRequest.TenderType tenderType = ChargeRequest.TenderType.valueOf(i.toString());
+                        restrictPaymentMethods.add(tenderType);
+                    } catch (IllegalArgumentException ie) {
+                        call.reject("paymentMethod type '" + i.toString() + "' is invalid");
+                        return;
+                    }
+                }
+            }
+        } catch (JSONException e) {
+            restrictPaymentMethods = new ArrayList<>();
+        }
+
         saveCall(call);
         try {
-            ChargeRequest request = new ChargeRequest.Builder(totalAmount, currencyCode).build();
-            Intent intent = posClient.createChargeIntent(request);
+            ChargeRequest.Builder request = new ChargeRequest.Builder(totalAmount, currencyCode);
+
+            if(!restrictPaymentMethods.isEmpty()) {
+                request.restrictTendersTo(restrictPaymentMethods);
+            }
+
+            Intent intent = posClient.createChargeIntent(request.build());
             startActivityForResult(call, intent, CHARGE_REQUEST_CODE);
         } catch (ActivityNotFoundException e) {
             // TODO: Square not installed

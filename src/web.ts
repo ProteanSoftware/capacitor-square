@@ -16,6 +16,7 @@ export class SquarePaymentsWeb extends WebPlugin implements SquarePaymentsPlugin
   async startTransaction(_options: {
     totalAmount: number,
     currencyCode: string,
+    allowedPaymentMethods?: string[],
     callbackUrl?: string
   }): Promise<void> {
     throw new Error("Method not implemented.");

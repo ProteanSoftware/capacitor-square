@@ -25,6 +25,7 @@ SquarePayments.initApp({
 SquarePayments.startTransaction({
   totalAmount: 100, // amount in pennies/cents
   currencyCode: "GBP", // ISO currency code, must be support by square
+  allowedPaymentMethods: ["CARD"], // Sqaure TendType: https://developer.squareup.com/docs/api/point-of-sale/android/com/squareup/sdk/pos/ChargeRequest.TenderType.html
   callbackUrl: "MyAppUrl://callback" // see iOS setup
 })
 
