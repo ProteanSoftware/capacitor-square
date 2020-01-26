@@ -138,7 +138,7 @@ public class SquarePayments extends Plugin {
             }
 
             if (requestCode != CHARGE_REQUEST_CODE) {
-                errorObject.put("error", "response code did not matchl");
+                errorObject.put("error", "response code did not match");
                 notifyListeners("transactionFailed", errorObject);
                 savedCall.success();
                 return;
