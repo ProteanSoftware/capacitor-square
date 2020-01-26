@@ -118,7 +118,7 @@ public class SquarePayments: CAPPlugin {
                   // Print checkout object
                   self.notifyListeners("transactionComplete", data: [
                       "message": "Transaction successful: \(response)",
-                      "clientTransactionId": success.clientTransactionId
+                      "clientTransactionId": response.clientTransactionId
                   ]);
                 } else if decodeError != nil {
                     // Print decode error
