@@ -1,6 +1,6 @@
 {
   "name": "@proteansoftware/capacitor-square",
-  "version": "0.0.1-alpha.31",
+  "version": "2.0.0",
   "description": "Integrate with Square Payments SDK",
   "main": "dist/esm/index.js",
   "types": "dist/esm/index.d.ts",
@@ -13,11 +13,11 @@
   "author": "Ashley Medway",
   "license": "MIT",
   "dependencies": {
-    "@capacitor/core": "latest"
+    "@capacitor/android": "^2.2.0",
+    "@capacitor/core": "^2.2.0",
+    "@capacitor/ios": "^2.2.0"
   },
   "devDependencies": {
-    "@capacitor/android": "latest",
-    "@capacitor/ios": "latest",
     "mkdirp": "^0.5.1",
     "rimraf": "^3.0.0",
     "typescript": "^3.2.4"
