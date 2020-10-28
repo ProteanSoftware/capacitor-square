@@ -13,7 +13,7 @@ public class SquarePayments: CAPPlugin {
    @objc func initApp(_ call: CAPPluginCall) {
       if let applicationId = call.getString("applicationId") {
         SquarePayments.ApplicationId = applicationId;
-        SCCAPIRequest.setClientID(applicationId);
+        SCCAPIRequest.setApplicationID(applicationId);
         call.resolve([
           "message": "set applicationId"
         ]);
@@ -86,12 +86,14 @@ public class SquarePayments: CAPPlugin {
         request = try SCCAPIRequest(callbackURL: yourCallbackURL,
                                     amount: amount,
                                     userInfoString: nil,
-                                    merchantID: nil,
+                                    locationID: nil,
                                     notes: nil,
                                     customerID: nil,
                                     supportedTenderTypes: supportedTenderTypes,
                                     clearsDefaultFees: false,
-                                    returnAutomaticallyAfterPayment: true)
+                                    returnsAutomaticallyAfterPayment: true,
+                                    disablesKeyedInCardEntry: false,
+                                    skipsReceipt: false)
     } catch {
       call.reject("unable to create request");
       return;
@@ -118,7 +120,7 @@ public class SquarePayments: CAPPlugin {
                   // Print checkout object
                   self.notifyListeners("transactionComplete", data: [
                       "message": "Transaction successful: \(response)",
-                      "clientTransactionId": response.clientTransactionID
+                      "clientTransactionId": response.clientTransactionID ?? "missing id"
                   ]);
                 } else if decodeError != nil {
                     // Print decode error
@@ -130,7 +132,7 @@ public class SquarePayments: CAPPlugin {
                 } else {
                     // Print the error code
                     self.notifyListeners("transactionFailed", data: [
-                        "message": "Request failed: \(response.error)"
+                        "message": "Request failed: \(String(describing: response.error))"
                     ]);
                 }
 
