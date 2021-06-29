@@ -22,12 +22,8 @@ import org.json.JSONException;
 import java.util.ArrayList;
 import java.util.List;
 
-@NativePlugin(
-    requestCodes={SquarePayments.CHARGE_REQUEST_CODE}
-)
+@CapacitorPlugin()
 public class SquarePayments extends Plugin {
-
-    public static final int CHARGE_REQUEST_CODE = 1;
     private static PosClient posClient = null;
 
     @PluginMethod()
@@ -108,7 +104,7 @@ public class SquarePayments extends Plugin {
             }
 
             Intent intent = posClient.createChargeIntent(request.build());
-            startActivityForResult(call, intent, CHARGE_REQUEST_CODE);
+            startActivityForResult(call, intent, "chargeRequest");
         } catch (ActivityNotFoundException e) {
             // TODO: Square not installed
             if(posClient != null) {
@@ -122,23 +118,14 @@ public class SquarePayments extends Plugin {
         }
     }
 
-    // in order to handle the intents result, you have to @Override handleOnActivityResult
-    @Override
-    protected void handleOnActivityResult(int requestCode, int resultCode, Intent data) {
-        super.handleOnActivityResult(requestCode, resultCode, data);
+    @ActivityCallback
+    protected void chargeRequest(int resultCode, Intent data) {
         // Get the previously saved call
         PluginCall savedCall = getSavedCall();
         JSObject errorObject = new JSObject();
         try {
             if (savedCall == null) {
                 errorObject.put("error", "could not retrieve saved call");
-                notifyListeners("transactionFailed", errorObject);
-                savedCall.success();
-                return;
-            }
-
-            if (requestCode != CHARGE_REQUEST_CODE) {
-                errorObject.put("error", "response code did not match");
                 notifyListeners("transactionFailed", errorObject);
                 savedCall.success();
                 return;

@@ -1,4 +1,4 @@
-import { WebPlugin } from '@capacitor/core';
+import { WebPlugin, registerPlugin } from '@capacitor/core';
 import { SquarePaymentsPlugin } from './definitions';
 
 export class SquarePaymentsWeb extends WebPlugin implements SquarePaymentsPlugin {
@@ -27,9 +27,17 @@ export class SquarePaymentsWeb extends WebPlugin implements SquarePaymentsPlugin
   }
 }
 
-const SquarePayments = new SquarePaymentsWeb();
+// const SquarePayments = new SquarePaymentsWeb();
 
+// export { SquarePayments };
+
+// import { registerWebPlugin } from '@capacitor/core';
+// registerWebPlugin(SquarePayments);
+
+
+const SquarePayments = registerPlugin<SquarePaymentsWeb>('StartNavigationPlugin', {
+  web: () => import('./web').then(m => new m.SquarePaymentsWeb())
+});
+
+export * from './definitions';
 export { SquarePayments };
-
-import { registerWebPlugin } from '@capacitor/core';
-registerWebPlugin(SquarePayments);
