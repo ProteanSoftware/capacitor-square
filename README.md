@@ -13,8 +13,7 @@ Capacitor plugin that allows your app to integrate with square payments app
 ## Usage
 
 ```ts
-import { Plugins } from "@capacitor/core";
-const { SquarePayments } = Plugins;
+import { SquarePayments } from "@proteansoftware/capacitor-square";
 
 //
 // Initalise the square plugin
