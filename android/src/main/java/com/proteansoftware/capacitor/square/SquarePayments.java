@@ -23,7 +23,7 @@ import org.json.JSONException;
 import java.util.ArrayList;
 import java.util.List;
 
-@CapacitorPlugin()
+@CapacitorPlugin(name = "SquarePayments")
 public class SquarePayments extends Plugin {
     private static PosClient posClient = null;
 
