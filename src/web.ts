@@ -35,7 +35,7 @@ export class SquarePaymentsWeb extends WebPlugin implements SquarePaymentsPlugin
 // registerWebPlugin(SquarePayments);
 
 
-const SquarePayments = registerPlugin<SquarePaymentsWeb>('StartNavigationPlugin', {
+const SquarePayments = registerPlugin<SquarePaymentsWeb>('SquarePaymentsPlugin', {
   web: () => import('./web').then(m => new m.SquarePaymentsWeb())
 });
 

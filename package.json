@@ -1,6 +1,6 @@
 {
   "name": "@proteansoftware/capacitor-square",
-  "version": "3.1.1",
+  "version": "3.1.3",
   "description": "Integrate with Square Payments SDK",
   "main": "dist/esm/index.js",
   "types": "dist/esm/index.d.ts",
