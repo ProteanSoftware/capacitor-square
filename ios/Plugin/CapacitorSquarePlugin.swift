@@ -23,7 +23,7 @@ public class CapacitorSquarePlugin: CAPPlugin {
     }
 
     @objc func startTransaction(_ call: CAPPluginCall) {
-        if implementation.isInitalised() {
+        if !implementation.isInitalised() {
             call.reject("client not setup, call initApp first")
         }
 
