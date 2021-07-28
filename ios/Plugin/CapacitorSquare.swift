@@ -4,11 +4,11 @@ import Foundation
     static var ApplicationId = "";
 
     @objc public func setApplicationID(_ applicationId: String) {
-        SquarePayments.ApplicationId = applicationId;
+        CapacitorSquare.ApplicationId = applicationId;
     }
 
-    @objc public func isInitalised() -> boolean {
-        return SquarePayments.ApplicationId.count > 0;
+    @objc public func isInitalised() -> Bool {
+        return CapacitorSquare.ApplicationId.count > 0;
     }
 
     
