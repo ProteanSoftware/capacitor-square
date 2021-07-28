@@ -7,27 +7,26 @@ import android.content.Intent;
 
 import com.getcapacitor.JSArray;
 import com.getcapacitor.JSObject;
-import com.getcapacitor.annotation.ActivityCallback;
-import com.getcapacitor.annotation.CapacitorPlugin;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
-
+import com.getcapacitor.annotation.ActivityCallback;
+import com.getcapacitor.annotation.CapacitorPlugin;
 import com.squareup.sdk.pos.ChargeRequest;
 import com.squareup.sdk.pos.CurrencyCode;
-import com.squareup.sdk.pos.PosClient;
-import com.squareup.sdk.pos.PosSdk;
 
 import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@CapacitorPlugin(name = "SquarePayments")
-public class SquarePayments extends Plugin {
-    private static PosClient posClient = null;
+@CapacitorPlugin(name = "CapacitorSquare")
+public class CapacitorSquarePlugin extends Plugin {
 
-    @PluginMethod()
+    private CapacitorSquare implementation = new CapacitorSquare();
+    private String savedCallId = null;
+
+    @PluginMethod
     public void initApp(PluginCall call) {
         String applicationId = call.getString("applicationId");
         if(applicationId == null || applicationId.length() == 0) {
@@ -36,7 +35,7 @@ public class SquarePayments extends Plugin {
         }
 
         Context context = getContext();
-        posClient = PosSdk.createClient(context, applicationId);
+        implementation.initApp(applicationId, context);
 
         JSObject data = new JSObject();
         data.put("message", "set applicationId");
@@ -45,76 +44,63 @@ public class SquarePayments extends Plugin {
 
     @PluginMethod()
     public void startTransaction(PluginCall call) {
-        if(posClient == null) {
+        if (!implementation.isInitalised()) {
             call.reject("client not setup, call initApp first");
             return;
         }
 
         Integer totalAmount = call.getInt("totalAmount");
-        if(totalAmount == null) {
+        if (totalAmount == null) {
             call.reject("totalAmount is null");
             return;
         }
 
-        if(totalAmount <= 0) {
+        if (totalAmount <= 0) {
             call.reject("totalAmount must be greater than 0");
             return;
         }
 
         String currencyCodeString = call.getString("currencyCode");
-        if(currencyCodeString == null || currencyCodeString.length() == 0) {
+        if (currencyCodeString == null || currencyCodeString.length() == 0) {
             call.reject("currencyCode is null");
             return;
         }
 
-        CurrencyCode currencyCode;
-        try {
-            currencyCode = CurrencyCode.valueOf(currencyCodeString);
-        } catch (IllegalArgumentException e) {
+        CurrencyCode currencyCode = implementation.parseCurrencyCode(currencyCodeString);
+        if (currencyCode == null) {
             call.reject("currencyCode '" + currencyCodeString + "' is invalid");
-            return;
         }
 
         JSArray defaultPaymentMethods = new JSArray();
         defaultPaymentMethods.put(-1);
 
-        ArrayList<ChargeRequest.TenderType> restrictPaymentMethods = new ArrayList<>();
+        List allowedPaymentMethods = null;
         try {
-            List allowedPaymentMethods = call.getArray("allowedPaymentMethods", defaultPaymentMethods).toList();
-            if(!allowedPaymentMethods.contains("ALL")) {
-                for (Object i: allowedPaymentMethods) {
-                    try {
-                        ChargeRequest.TenderType tenderType = ChargeRequest.TenderType.valueOf(i.toString());
-                        restrictPaymentMethods.add(tenderType);
-                    } catch (IllegalArgumentException ie) {
-                        call.reject("paymentMethod type '" + i.toString() + "' is invalid");
-                        return;
-                    }
-                }
-            }
+            allowedPaymentMethods = call.getArray("allowedPaymentMethods", defaultPaymentMethods).toList();
         } catch (JSONException e) {
-            restrictPaymentMethods = new ArrayList<>();
+            allowedPaymentMethods = new ArrayList<>();
         }
 
-        saveCall(call);
+        ArrayList<ChargeRequest.TenderType> restrictPaymentMethods = null;
         try {
-            ChargeRequest.Builder request = new ChargeRequest.Builder(totalAmount, currencyCode);
+            restrictPaymentMethods = implementation.parsePaymentMethods(allowedPaymentMethods);
+        } catch (Exception e) {
+            call.reject(e.getMessage());
+            return;
+        }
 
-            if(!restrictPaymentMethods.isEmpty()) {
-                request.restrictTendersTo(restrictPaymentMethods);
-            }
+        savedCallId = call.getCallbackId();
+        bridge.saveCall(call);
 
-            Intent intent = posClient.createChargeIntent(request.build());
+        try {
+            Intent intent = implementation.createChargeIntent(totalAmount, currencyCode, restrictPaymentMethods);
             startActivityForResult(call, intent, "chargeRequest");
         } catch (ActivityNotFoundException e) {
-            // TODO: Square not installed
-            if(posClient != null) {
-                posClient.openPointOfSalePlayStoreListing();
-            }
-            freeSavedCall();
+            implementation.openPointOfSalePlayStoreListing();
+            call.release(bridge);
             call.reject(e.getMessage());
         } catch (Exception e) {
-            freeSavedCall();
+            call.release(bridge);
             call.reject(e.getMessage());
         }
     }
@@ -122,20 +108,20 @@ public class SquarePayments extends Plugin {
     @ActivityCallback
     protected void chargeRequest(int resultCode, Intent data) {
         // Get the previously saved call
-        PluginCall savedCall = getSavedCall();
+        PluginCall savedCall = bridge.getSavedCall(savedCallId);
         JSObject errorObject = new JSObject();
         try {
             if (savedCall == null) {
                 errorObject.put("error", "could not retrieve saved call");
                 notifyListeners("transactionFailed", errorObject);
-                savedCall.success();
+                savedCall.resolve();
                 return;
             }
 
             // Handle expected results
             if (resultCode == Activity.RESULT_OK) {
                 // Handle success
-                ChargeRequest.Success success = posClient.parseChargeSuccess(data);
+                ChargeRequest.Success success = implementation.parseChargeSuccess(data);
                 JSObject resultData = new JSObject();
                 resultData.put("message", "Success");
                 resultData.put("clientTransactionId", success.clientTransactionId);
@@ -143,16 +129,16 @@ public class SquarePayments extends Plugin {
                 savedCall.success();
             } else {
                 // Handle expected errors
-                ChargeRequest.Error error = posClient.parseChargeError(data);
+                ChargeRequest.Error error = implementation.parseChargeError(data);
                 String errorMessage = "Error" + error.code + "\nclientTransactionId" + error.debugDescription;
                 errorObject.put("error", errorMessage);
                 notifyListeners("transactionFailed", errorObject);
-                savedCall.success();
+                savedCall.resolve();
             }
         } catch (Exception e) {
             errorObject.put("error", e.getMessage());
             notifyListeners("transactionFailed", errorObject);
-            savedCall.success();
+            savedCall.resolve();
         }
     }
 }

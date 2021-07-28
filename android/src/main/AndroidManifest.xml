@@ -1,5 +1,3 @@
-
-  <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-      package="com.proteansoftware.capacitor.square.capacitorsquare">
-  </manifest>
-  
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.proteansoftware.capacitor.square">
+</manifest>
