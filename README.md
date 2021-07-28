@@ -12,15 +12,15 @@ npx cap sync
 ## Usage
 
 ```ts
-import { SquarePayments } from "@proteansoftware/capacitor-square";
+import { CapacitorSquare } from "@proteansoftware/capacitor-square";
 
 //
 // Initalise the square plugin
-SquarePayments.initApp({
+CapacitorSquare.initApp({
   applicationId: "Some square app id"
 });
 
-SquarePayments.startTransaction({
+CapacitorSquare.startTransaction({
   totalAmount: 100, // amount in pennies/cents
   currencyCode: "GBP", // ISO currency code, must be support by square
   allowedPaymentMethods: ["CARD"], // Sqaure TendType: https://developer.squareup.com/docs/api/point-of-sale/android/com/squareup/sdk/pos/ChargeRequest.TenderType.html
@@ -39,6 +39,9 @@ Follow these setup steps from square to enable call back to your app: [Square Do
 * [`initApp(...)`](#initapp)
 * [`startTransaction(...)`](#starttransaction)
 * [`handleIosResponse(...)`](#handleiosresponse)
+* [`addListener(...)`](#addlistener)
+* [`addListener(...)`](#addlistener)
+* [Interfaces](#interfaces)
 
 </docgen-index>
 
@@ -88,5 +91,47 @@ handleIosResponse(options: { url: string; }) => any
 **Returns:** <code>any</code>
 
 --------------------
+
+
+### addListener(...)
+
+```typescript
+addListener(eventName: 'transactionComplete', listenerFunc: TransactionCompletedListener) => Promise<PluginListenerHandle> & PluginListenerHandle
+```
+
+| Param              | Type                                                                 |
+| ------------------ | -------------------------------------------------------------------- |
+| **`eventName`**    | <code>"transactionComplete"</code>                                   |
+| **`listenerFunc`** | <code>(callback: { clientTransactionId: string; }) =&gt; void</code> |
+
+**Returns:** <code>any</code>
+
+--------------------
+
+
+### addListener(...)
+
+```typescript
+addListener(eventName: 'transactionFailed', listenerFunc: TransactionFailedListener) => Promise<PluginListenerHandle> & PluginListenerHandle
+```
+
+| Param              | Type                                                |
+| ------------------ | --------------------------------------------------- |
+| **`eventName`**    | <code>"transactionFailed"</code>                    |
+| **`listenerFunc`** | <code>(callback: { error: any; }) =&gt; void</code> |
+
+**Returns:** <code>any</code>
+
+--------------------
+
+
+### Interfaces
+
+
+#### PluginListenerHandle
+
+| Prop         | Type                      |
+| ------------ | ------------------------- |
+| **`remove`** | <code>() =&gt; any</code> |
 
 </docgen-api>
