@@ -94,15 +94,15 @@ public class CapacitorSquarePlugin: CAPPlugin {
                                         returnsAutomaticallyAfterPayment: true,
                                         disablesKeyedInCardEntry: false,
                                         skipsReceipt: false)
-        } catch {
-            call.reject("unable to create request");
+        } catch (let exception) {
+            call.reject("unable to create request: " + exception.localizedDescription);
             return;
         }
 
         do {
             try SCCAPIConnection.perform(request)
-            } catch {
-                call.reject("unable to action request")
+            } catch (let exception) {
+                call.reject("unable to action request: " + exception.localizedDescription)
             }
 
         call.resolve();
