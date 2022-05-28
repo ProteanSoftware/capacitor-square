@@ -5,6 +5,8 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 
+import androidx.activity.result.ActivityResult;
+
 import com.getcapacitor.JSArray;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
@@ -24,7 +26,6 @@ import java.util.List;
 public class CapacitorSquarePlugin extends Plugin {
 
     private CapacitorSquare implementation = new CapacitorSquare();
-    private String savedCallId = null;
 
     @PluginMethod
     public void initApp(PluginCall call) {
@@ -89,9 +90,6 @@ public class CapacitorSquarePlugin extends Plugin {
             return;
         }
 
-        savedCallId = call.getCallbackId();
-        bridge.saveCall(call);
-
         try {
             Intent intent = implementation.createChargeIntent(totalAmount, currencyCode, restrictPaymentMethods);
             startActivityForResult(call, intent, "chargeRequest");
@@ -106,39 +104,38 @@ public class CapacitorSquarePlugin extends Plugin {
     }
 
     @ActivityCallback
-    protected void chargeRequest(int resultCode, Intent data) {
-        // Get the previously saved call
-        PluginCall savedCall = bridge.getSavedCall(savedCallId);
+    protected void chargeRequest(PluginCall call, ActivityResult result) {
         JSObject errorObject = new JSObject();
         try {
-            if (savedCall == null) {
+            if (call == null) {
                 errorObject.put("error", "could not retrieve saved call");
                 notifyListeners("transactionFailed", errorObject);
-                savedCall.resolve();
                 return;
             }
 
             // Handle expected results
-            if (resultCode == Activity.RESULT_OK) {
+            if (result.getResultCode() == Activity.RESULT_OK) {
                 // Handle success
+                Intent data = result.getData();
                 ChargeRequest.Success success = implementation.parseChargeSuccess(data);
                 JSObject resultData = new JSObject();
                 resultData.put("message", "Success");
                 resultData.put("clientTransactionId", success.clientTransactionId);
                 notifyListeners("transactionComplete", resultData);
-                savedCall.success();
+                call.success();
             } else {
                 // Handle expected errors
+                Intent data = result.getData();
                 ChargeRequest.Error error = implementation.parseChargeError(data);
                 String errorMessage = "Error" + error.code + "\nclientTransactionId" + error.debugDescription;
                 errorObject.put("error", errorMessage);
                 notifyListeners("transactionFailed", errorObject);
-                savedCall.resolve();
+                call.resolve();
             }
         } catch (Exception e) {
             errorObject.put("error", e.getMessage());
             notifyListeners("transactionFailed", errorObject);
-            savedCall.resolve();
+            call.resolve();
         }
     }
 }
