@@ -18,14 +18,34 @@ import { CapacitorSquare } from "@proteansoftware/capacitor-square";
 // Initalise the square plugin
 CapacitorSquare.initApp({
   applicationId: "Some square app id"
+}).then(() => {
+  console.log("Square payment ready");
+}).catch(error => {
+  console.error(error);
 });
 
+// Listen for sucessful payments
+CapacitorSquare.addListener("transactionComplete", callback => {
+  console.log("clientTransactionId:" + callback.clientTransactionId);
+  console.log("serverTransactionId:" + callback.serverTransactionId);
+});
+
+// Listen for failed payments
+CapacitorSquare.addListener("transactionFailed", callback => {
+  console.error(callback.error);
+});
+
+// Initiate a transaction
 CapacitorSquare.startTransaction({
   totalAmount: 100, // amount in pennies/cents
   currencyCode: "GBP", // ISO currency code, must be support by square
   allowedPaymentMethods: ["CARD"], // Sqaure TendType: https://developer.squareup.com/docs/api/point-of-sale/android/com/squareup/sdk/pos/ChargeRequest.TenderType.html
   callbackUrl: "MyAppUrl://callback" // see iOS setup
-})
+}).then(() => {
+  console.log("transaction started");
+}).catch(error => {
+  console.error(error);
+});
 
 ```
 
