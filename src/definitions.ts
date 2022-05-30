@@ -1,6 +1,9 @@
 import { PluginListenerHandle } from "@capacitor/core";
 
-export type TransactionCompletedListener = (callback: { clientTransactionId: string }) => void;
+export type TransactionCompletedListener = (callback: { 
+  clientTransactionId: string,
+  serverTransactionId: string
+}) => void;
 
 export type TransactionFailedListener = (callback: { error: any }) => void;
 

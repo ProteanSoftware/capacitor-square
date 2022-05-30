@@ -99,10 +99,10 @@ handleIosResponse(options: { url: string; }) => any
 addListener(eventName: 'transactionComplete', listenerFunc: TransactionCompletedListener) => Promise<PluginListenerHandle> & PluginListenerHandle
 ```
 
-| Param              | Type                                                                 |
-| ------------------ | -------------------------------------------------------------------- |
-| **`eventName`**    | <code>"transactionComplete"</code>                                   |
-| **`listenerFunc`** | <code>(callback: { clientTransactionId: string; }) =&gt; void</code> |
+| Param              | Type                                                                                              |
+| ------------------ | ------------------------------------------------------------------------------------------------- |
+| **`eventName`**    | <code>"transactionComplete"</code>                                                                |
+| **`listenerFunc`** | <code>(callback: { clientTransactionId: string; serverTransactionId: string; }) =&gt; void</code> |
 
 **Returns:** <code>any</code>
 

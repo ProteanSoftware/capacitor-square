@@ -121,6 +121,7 @@ public class CapacitorSquarePlugin extends Plugin {
                 JSObject resultData = new JSObject();
                 resultData.put("message", "Success");
                 resultData.put("clientTransactionId", success.clientTransactionId);
+                resultData.put("serverTransactionId", success.serverTransactionId);
                 notifyListeners("transactionComplete", resultData);
                 call.success();
             } else {
