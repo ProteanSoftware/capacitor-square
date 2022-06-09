@@ -121,7 +121,7 @@ public class CapacitorSquarePlugin: CAPPlugin {
                        self.notifyListeners("transactionComplete", data: [
                            "message": "Transaction successful: \(response)",
                            "clientTransactionId": response.clientTransactionID ?? "missing id",
-                           "serverTransactionId": response.serverTransactionID ?? "missing id"
+                           "serverTransactionId": response.transactionID ?? "missing id"
                        ]);
                      } else if decodeError != nil {
                          // Print decode error
