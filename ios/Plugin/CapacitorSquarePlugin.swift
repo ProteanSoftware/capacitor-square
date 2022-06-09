@@ -120,7 +120,7 @@ public class CapacitorSquarePlugin: CAPPlugin {
                        // Print checkout object
                        self.notifyListeners("transactionComplete", data: [
                            "message": "Transaction successful: \(response)",
-                           "clientTransactionId": response.clientTransactionID ?? "missing id"
+                           "clientTransactionId": response.clientTransactionID ?? "missing id",
                            "serverTransactionId": response.serverTransactionID ?? "missing id"
                        ]);
                      } else if decodeError != nil {
