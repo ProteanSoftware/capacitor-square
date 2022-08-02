@@ -11,6 +11,39 @@ npx cap sync
 
 ## Usage
 
+App Initalisation - app.component.ts (Angular example)
+
+```ts
+import { App } from "@capacitor/app";
+import { Platform } from "@ionic/angular";
+import { CapacitorSquare } from "@proteansoftware/capacitor-square";
+
+export class AppComponent {
+  constructor(private platform: Platform) {
+    this.initializeApp();
+  }
+  
+  private void initializeApp() {
+    this.platform.ready().then(() => {
+      App.addListener("appUrlOpen", (data: URLOpenListenerEvent) => {
+        console.log("appUrlOpen: " + data.url);
+
+        if (data.url.toLowerCase().startsWith("app-url-scheme://callback-url")) {
+          CapacitorSquare.handleIosResponse({
+            url: data.url
+          }).then(() => {
+            console.log("handle ios callback - successful");
+          }).catch(e => {
+            console.error("handle ios callback - error - " + e);
+          });
+        }
+      });
+    });
+  }
+}
+```
+
+Payment flow
 ```ts
 import { CapacitorSquare } from "@proteansoftware/capacitor-square";
 
@@ -40,7 +73,7 @@ CapacitorSquare.startTransaction({
   totalAmount: 100, // amount in pennies/cents
   currencyCode: "GBP", // ISO currency code, must be support by square
   allowedPaymentMethods: ["CARD"], // Sqaure TendType: https://developer.squareup.com/docs/api/point-of-sale/android/com/squareup/sdk/pos/ChargeRequest.TenderType.html
-  callbackUrl: "MyAppUrl://callback" // see iOS setup
+  callbackUrl: "app-url-scheme://callback-url" // see iOS setup
 }).then(() => {
   console.log("transaction started");
 }).catch(error => {
