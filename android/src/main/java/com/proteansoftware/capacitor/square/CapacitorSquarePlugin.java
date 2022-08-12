@@ -16,6 +16,7 @@ import com.getcapacitor.annotation.ActivityCallback;
 import com.getcapacitor.annotation.CapacitorPlugin;
 import com.squareup.sdk.pos.ChargeRequest;
 import com.squareup.sdk.pos.CurrencyCode;
+import com.squareup.sdk.pos.PosApi;
 
 import org.json.JSONException;
 
@@ -90,8 +91,32 @@ public class CapacitorSquarePlugin extends Plugin {
             return;
         }
 
+        Integer autoReturnTimeout = null;
         try {
-            Intent intent = implementation.createChargeIntent(totalAmount, currencyCode, restrictPaymentMethods);
+            autoReturnTimeout = call.getInt("autoReturnTimeout", null);
+
+            if (autoReturnTimeout != null) {
+                if (autoReturnTimeout < PosApi.AUTO_RETURN_TIMEOUT_MIN_MILLIS) {
+                    call.reject("autoReturnTimeout must be >= 3200");
+                    return;
+                }
+
+                if (autoReturnTimeout > PosApi.AUTO_RETURN_TIMEOUT_MAX_MILLIS) {
+                    call.reject("autoReturnTimeout must be <= 10000");
+                    return;
+                }
+            }
+        } catch (Exception e) {
+            call.reject(e.getMessage());
+            return;
+        }
+
+        try {
+            Intent intent = implementation.createChargeIntent(
+                    totalAmount,
+                    currencyCode,
+                    restrictPaymentMethods,
+                    autoReturnTimeout);
             startActivityForResult(call, intent, "chargeRequest");
         } catch (ActivityNotFoundException e) {
             implementation.openPointOfSalePlayStoreListing();

@@ -1,6 +1,6 @@
 import { WebPlugin } from '@capacitor/core';
 
-import type { CapacitorSquarePlugin } from './definitions';
+import type { AutoReturn, CapacitorSquarePlugin } from './definitions';
 
 export class CapacitorSquareWeb extends WebPlugin implements CapacitorSquarePlugin {
   async initApp(_options: { applicationId: string; }): Promise<{ message: string }> {
@@ -10,8 +10,9 @@ export class CapacitorSquareWeb extends WebPlugin implements CapacitorSquarePlug
   async startTransaction(_options: {
     totalAmount: number,
     currencyCode: string,
-    allowedPaymentMethods?: string[],
-    callbackUrl?: string
+    allowedPaymentMethods?: string[] | null,
+    autoReturnTimeout?: number | AutoReturn.NoTimeout | null,
+    callbackUrl?: string | null
   }): Promise<void> {
     throw new Error("Method not implemented.");
   }

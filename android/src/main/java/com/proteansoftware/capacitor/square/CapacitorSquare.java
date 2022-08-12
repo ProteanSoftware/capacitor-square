@@ -3,13 +3,17 @@ package com.proteansoftware.capacitor.square;
 import android.content.Context;
 import android.content.Intent;
 
+import androidx.annotation.Nullable;
+
 import com.squareup.sdk.pos.ChargeRequest;
 import com.squareup.sdk.pos.CurrencyCode;
+import com.squareup.sdk.pos.PosApi;
 import com.squareup.sdk.pos.PosClient;
 import com.squareup.sdk.pos.PosSdk;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class CapacitorSquare {
     private static PosClient posClient = null;
@@ -49,11 +53,19 @@ public class CapacitorSquare {
         return restrictPaymentMethods;
     }
 
-    public Intent createChargeIntent(Integer totalAmount, CurrencyCode currencyCode, ArrayList<ChargeRequest.TenderType> restrictPaymentMethods) {
+    public Intent createChargeIntent(
+            Integer totalAmount,
+            CurrencyCode currencyCode,
+            ArrayList<ChargeRequest.TenderType> restrictPaymentMethods,
+            @Nullable Integer autoReturnTimeout) {
         ChargeRequest.Builder request = new ChargeRequest.Builder(totalAmount, currencyCode);
 
         if (!restrictPaymentMethods.isEmpty()) {
             request.restrictTendersTo(restrictPaymentMethods);
+        }
+
+        if (autoReturnTimeout != null) {
+            request.autoReturn(autoReturnTimeout, autoReturnTimeout.equals(PosApi.AUTO_RETURN_NO_TIMEOUT) ? null : TimeUnit.MILLISECONDS);
         }
 
         Intent intent = posClient.createChargeIntent(request.build());
