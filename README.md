@@ -2,10 +2,22 @@
 
 Integrate with Square Payments SDK
 
+| Package Version | Capacitor Version |
+|-----------------|-------------------|
+| 4.X             | 4.X               |
+| 3.X             | 3.X               |
+
 ## Install
 
+Version 4.X is compatible with Capacitor 4.X
 ```bash
-npm install @proteansoftware/capacitor-square
+npm install @proteansoftware/capacitor-square@V4
+npx cap sync
+```
+
+Version 3.X is compatible with Capacitor 3.X
+```bash
+npm install @proteansoftware/capacitor-square@V3
 npx cap sync
 ```
 
