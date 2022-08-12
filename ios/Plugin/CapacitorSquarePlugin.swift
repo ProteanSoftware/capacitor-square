@@ -44,6 +44,8 @@ public class CapacitorSquarePlugin: CAPPlugin {
             return;
         }
 
+        let skipsReceipt = call.getBool("skipsReceipt", false);
+
         let yourCallbackURL = URL(string: callbackUrl)!
 
         // Specify the amount of money to charge.
@@ -93,7 +95,7 @@ public class CapacitorSquarePlugin: CAPPlugin {
                                         clearsDefaultFees: false,
                                         returnsAutomaticallyAfterPayment: true,
                                         disablesKeyedInCardEntry: false,
-                                        skipsReceipt: false)
+                                        skipsReceipt: skipsReceipt)
         } catch (let exception) {
             call.reject("unable to create request: " + exception.localizedDescription);
             return;

@@ -73,7 +73,8 @@ CapacitorSquare.startTransaction({
   totalAmount: 100, // amount in pennies/cents
   currencyCode: "GBP", // ISO currency code, must be support by square
   allowedPaymentMethods: ["CARD"], // Sqaure TendType: https://developer.squareup.com/docs/api/point-of-sale/android/com/squareup/sdk/pos/ChargeRequest.TenderType.html
-  autoReturnTimeout: 4000, // The timeout to set in milliseconds, or AutoReturn.NoTimeout. If you specify a timeout, it must be between 3200 milliseconds and 10000 milliseconds.
+  autoReturnTimeout: 4000, // Android only - The timeout to set in milliseconds, or AutoReturn.NoTimeout. If you specify a timeout, it must be between 3200 milliseconds and 10000 milliseconds.
+  skipsReceipt: false, // iOS only - No documentation available from Square
   callbackUrl: "app-url-scheme://callback-url" // see iOS setup
 }).then(() => {
   console.log("transaction started");
@@ -123,12 +124,12 @@ initApp(options: { applicationId: string; }) => any
 ### startTransaction(...)
 
 ```typescript
-startTransaction(options: { totalAmount: number; currencyCode: string; allowedPaymentMethods?: string[] | null; autoReturnTimeout?: number | AutoReturn.NoTimeout | null; callbackUrl?: string | null; }) => any
+startTransaction(options: { totalAmount: number; currencyCode: string; allowedPaymentMethods?: string[] | null; autoReturnTimeout?: number | AutoReturn.NoTimeout | null; skipsReceipt?: boolean | null; callbackUrl?: string | null; }) => any
 ```
 
-| Param         | Type                                                                                                                                                              |
-| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **`options`** | <code>{ totalAmount: number; currencyCode: string; allowedPaymentMethods?: {} \| null; autoReturnTimeout?: number \| null; callbackUrl?: string \| null; }</code> |
+| Param         | Type                                                                                                                                                                                              |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`options`** | <code>{ totalAmount: number; currencyCode: string; allowedPaymentMethods?: {} \| null; autoReturnTimeout?: number \| null; skipsReceipt?: boolean \| null; callbackUrl?: string \| null; }</code> |
 
 **Returns:** <code>any</code>
 

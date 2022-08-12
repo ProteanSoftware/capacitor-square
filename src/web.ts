@@ -12,6 +12,7 @@ export class CapacitorSquareWeb extends WebPlugin implements CapacitorSquarePlug
     currencyCode: string,
     allowedPaymentMethods?: string[] | null,
     autoReturnTimeout?: number | AutoReturn.NoTimeout | null,
+    skipsReceipt?: boolean | null,
     callbackUrl?: string | null
   }): Promise<void> {
     throw new Error("Method not implemented.");

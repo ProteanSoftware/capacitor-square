@@ -42,9 +42,13 @@ export interface CapacitorSquarePlugin {
      */
     allowedPaymentMethods?: string[] | null,
     /**
-     * The timeout to set in milliseconds, or AutoReturn.NoTimeout. If you specify a timeout, it must be between 3200 milliseconds and 10000 milliseconds.
+     * Android only - The timeout to set in milliseconds, or AutoReturn.NoTimeout. If you specify a timeout, it must be between 3200 milliseconds and 10000 milliseconds.
      */
     autoReturnTimeout?: number | AutoReturn.NoTimeout | null,
+    /**
+     * iOS only - No documentation available from Square
+     */
+    skipsReceipt?: boolean | null,
     /**
      * see iOS setup
      */
