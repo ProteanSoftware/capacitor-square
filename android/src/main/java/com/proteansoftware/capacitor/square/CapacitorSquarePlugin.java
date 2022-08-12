@@ -96,7 +96,7 @@ public class CapacitorSquarePlugin extends Plugin {
             autoReturnTimeout = call.getInt("autoReturnTimeout", null);
 
             if (autoReturnTimeout != null) {
-                if (autoReturnTimeout < PosApi.AUTO_RETURN_TIMEOUT_MIN_MILLIS) {
+                if (autoReturnTimeout < PosApi.AUTO_RETURN_TIMEOUT_MIN_MILLIS && autoReturnTimeout != PosApi.AUTO_RETURN_NO_TIMEOUT) {
                     call.reject("autoReturnTimeout must be >= 3200");
                     return;
                 }
