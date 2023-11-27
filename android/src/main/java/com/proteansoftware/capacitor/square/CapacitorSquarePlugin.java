@@ -143,7 +143,8 @@ public class CapacitorSquarePlugin extends Plugin {
         JSObject errorObject = new JSObject();
         try {
             if (call == null) {
-                errorObject.put("error", "NO_SAVED_CALL");
+                errorObject.put("status", "error");
+                errorObject.put("error_code", "NO_SAVED_CALL");
                 errorObject.put("errorDebugDescription", "could not retrieve saved call");
                 notifyListeners("transactionFailed", errorObject);
                 return;
@@ -155,7 +156,7 @@ public class CapacitorSquarePlugin extends Plugin {
                 Intent data = result.getData();
                 ChargeRequest.Success success = implementation.parseChargeSuccess(data);
                 JSObject resultData = new JSObject();
-                resultData.put("message", "Success");
+                resultData.put("status", "ok");
                 resultData.put("clientTransactionId", success.clientTransactionId);
                 resultData.put("serverTransactionId", success.serverTransactionId);
                 notifyListeners("transactionComplete", resultData);
@@ -164,13 +165,15 @@ public class CapacitorSquarePlugin extends Plugin {
                 // Handle expected errors
                 Intent data = result.getData();
                 ChargeRequest.Error error = implementation.parseChargeError(data);
-                errorObject.put("error", error.code);
+                errorObject.put("status", "error");
+                errorObject.put("error_code", error.code);
                 errorObject.put("errorDebugDescription", error.debugDescription);
                 notifyListeners("transactionFailed", errorObject);
                 call.resolve();
             }
         } catch (Exception e) {
-            errorObject.put("error", "EXCEPTION_ERROR");
+            errorObject.put("status", "error");
+            errorObject.put("error_code", "EXCEPTION_ERROR");
             errorObject.put("errorDebugDescription", e.getMessage());
             notifyListeners("transactionFailed", errorObject);
             call.resolve();
