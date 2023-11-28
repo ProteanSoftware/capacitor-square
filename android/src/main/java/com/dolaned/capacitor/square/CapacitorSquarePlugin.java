@@ -1,4 +1,4 @@
-package com.proteansoftware.capacitor.square;
+package com.dolaned.capacitor.square;
 
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
