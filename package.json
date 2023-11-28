@@ -1,7 +1,7 @@
 {
-  "name": "@proteansoftware/capacitor-square",
-  "version": "5.0.0",
-  "description": "Integrate with Square Payments SDK",
+  "name": "@dolaned/capacitor-square",
+  "version": "1.0.0",
+  "description": "Integrate with Square Payments SDK for capacitor",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
   "types": "dist/esm/index.d.ts",
@@ -13,14 +13,21 @@
     "ios/Plugin/",
     "ProteansoftwareCapacitorSquare.podspec"
   ],
-  "author": "Ashley Medway",
+  "contributors" : [
+    {
+      "name" : "Ashley Medway",
+      "email" : "ashleymedway@me.com",
+      "url" : "https://github.com/AshleyMedway"
+    }
+  ],
+  "author": "Dylan Aird",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ProteanSoftware/capacitor-square.git"
+    "url": "git+https://github.com/dolaned/capacitor-square.git"
   },
   "bugs": {
-    "url": "https://github.com/ProteanSoftware/capacitor-square/issues"
+    "url": "https://github.com/dolaned/capacitor-square/issues"
   },
   "keywords": [
     "capacitor",
