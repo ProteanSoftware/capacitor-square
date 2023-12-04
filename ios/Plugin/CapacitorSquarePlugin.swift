@@ -44,6 +44,17 @@ public class CapacitorSquarePlugin: CAPPlugin {
             return;
         }
 
+        //add optional location id
+        let locationId = call.getString("locationId") ?? nil;
+
+        // handle a note 
+        let note = call.getString("note") ?? "";
+        if(note.count >= 500) {
+            call.reject("Note is too long");
+            return;
+        }
+
+
         let yourCallbackURL = URL(string: callbackUrl)!
 
         // Specify the amount of money to charge.
@@ -86,8 +97,8 @@ public class CapacitorSquarePlugin: CAPPlugin {
             request = try SCCAPIRequest(callbackURL: yourCallbackURL,
                                         amount: amount,
                                         userInfoString: nil,
-                                        locationID: nil,
-                                        notes: nil,
+                                        locationID: locationId,
+                                        notes: note,
                                         customerID: nil,
                                         supportedTenderTypes: supportedTenderTypes,
                                         clearsDefaultFees: false,

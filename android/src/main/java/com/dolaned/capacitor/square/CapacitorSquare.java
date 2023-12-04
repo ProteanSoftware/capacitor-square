@@ -1,4 +1,4 @@
-package com.proteansoftware.capacitor.square;
+package com.dolaned.capacitor.square;
 
 import android.content.Context;
 import android.content.Intent;
@@ -57,11 +57,21 @@ public class CapacitorSquare {
             Integer totalAmount,
             CurrencyCode currencyCode,
             ArrayList<ChargeRequest.TenderType> restrictPaymentMethods,
-            @Nullable Integer autoReturnTimeout) {
+            @Nullable Integer autoReturnTimeout,
+            @Nullable String locationId,
+            @Nullable String note) {
         ChargeRequest.Builder request = new ChargeRequest.Builder(totalAmount, currencyCode);
 
         if (!restrictPaymentMethods.isEmpty()) {
             request.restrictTendersTo(restrictPaymentMethods);
+        }
+
+        if(locationId != null) {
+            request.enforceBusinessLocation(locationId);
+        }
+
+        if(note != null) {
+            request.note(note);
         }
 
         if (autoReturnTimeout != null) {

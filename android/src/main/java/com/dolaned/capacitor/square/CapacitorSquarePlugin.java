@@ -1,4 +1,4 @@
-package com.proteansoftware.capacitor.square;
+package com.dolaned.capacitor.square;
 
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
@@ -68,6 +68,12 @@ public class CapacitorSquarePlugin extends Plugin {
             return;
         }
 
+        String note = call.getString("note");
+        if (note != null && note.length() >= 500) {
+            call.reject("Note is too long.");
+            return;
+        }
+
         CurrencyCode currencyCode = implementation.parseCurrencyCode(currencyCodeString);
         if (currencyCode == null) {
             call.reject("currencyCode '" + currencyCodeString + "' is invalid");
@@ -111,12 +117,16 @@ public class CapacitorSquarePlugin extends Plugin {
             return;
         }
 
+        String locationId = call.getString("locationId");
+
         try {
             Intent intent = implementation.createChargeIntent(
                     totalAmount,
                     currencyCode,
                     restrictPaymentMethods,
-                    autoReturnTimeout);
+                    autoReturnTimeout,
+                    locationId,
+                    note);
             startActivityForResult(call, intent, "chargeRequest");
         } catch (ActivityNotFoundException e) {
             implementation.openPointOfSalePlayStoreListing();
@@ -133,7 +143,9 @@ public class CapacitorSquarePlugin extends Plugin {
         JSObject errorObject = new JSObject();
         try {
             if (call == null) {
-                errorObject.put("error", "could not retrieve saved call");
+                errorObject.put("status", "error");
+                errorObject.put("error_code", "NO_SAVED_CALL");
+                errorObject.put("errorDebugDescription", "could not retrieve saved call");
                 notifyListeners("transactionFailed", errorObject);
                 return;
             }
@@ -144,7 +156,7 @@ public class CapacitorSquarePlugin extends Plugin {
                 Intent data = result.getData();
                 ChargeRequest.Success success = implementation.parseChargeSuccess(data);
                 JSObject resultData = new JSObject();
-                resultData.put("message", "Success");
+                resultData.put("status", "ok");
                 resultData.put("clientTransactionId", success.clientTransactionId);
                 resultData.put("serverTransactionId", success.serverTransactionId);
                 notifyListeners("transactionComplete", resultData);
@@ -153,13 +165,16 @@ public class CapacitorSquarePlugin extends Plugin {
                 // Handle expected errors
                 Intent data = result.getData();
                 ChargeRequest.Error error = implementation.parseChargeError(data);
-                String errorMessage = "Error" + error.code + "\nclientTransactionId" + error.debugDescription;
-                errorObject.put("error", errorMessage);
+                errorObject.put("status", "error");
+                errorObject.put("error_code", error.code);
+                errorObject.put("errorDebugDescription", error.debugDescription);
                 notifyListeners("transactionFailed", errorObject);
                 call.resolve();
             }
         } catch (Exception e) {
-            errorObject.put("error", e.getMessage());
+            errorObject.put("status", "error");
+            errorObject.put("error_code", "EXCEPTION_ERROR");
+            errorObject.put("errorDebugDescription", e.getMessage());
             notifyListeners("transactionFailed", errorObject);
             call.resolve();
         }
