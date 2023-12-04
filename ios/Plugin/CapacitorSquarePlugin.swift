@@ -45,11 +45,11 @@ public class CapacitorSquarePlugin: CAPPlugin {
         }
 
         //add optional location id
-        let locationID = call.getString("locationId") ?? nil;
+        let locationId = call.getString("locationId") ?? nil;
 
         // handle a note 
-        let note = call.getString("note") ?? nil;
-        if(note != nil && note.count >= 500) {
+        let note = call.getString("note") ?? "";
+        if(note.count >= 500) {
             call.reject("Note is too long");
             return;
         }

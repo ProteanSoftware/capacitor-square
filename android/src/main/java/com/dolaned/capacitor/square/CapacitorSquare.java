@@ -1,4 +1,4 @@
-package com.proteansoftware.capacitor.square;
+package com.dolaned.capacitor.square;
 
 import android.content.Context;
 import android.content.Intent;
